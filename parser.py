@@ -1,0 +1,53 @@
+import pandas as pd
+import re
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Let's create a dummy log file for this example
+log_data = """
+192.168.1.1 - - [10/Mar/2022:10:00:00 +0000] "GET /index.html HTTP/1.1" 200 1500
+192.168.1.2 - - [10/Mar/2022:10:00:01 +0000] "GET /about.html HTTP/1.1" 200 800
+10.0.0.5 - - [10/Mar/2022:10:00:02 +0000] "GET /admin/login.php HTTP/1.1" 200 500
+192.168.1.1 - - [10/Mar/2022:10:00:03 +0000] "GET /contact.html HTTP/1.1" 200 900
+10.0.0.5 - - [10/Mar/2022:10:01:00 +0000] "GET /etc/passwd HTTP/1.1" 404 200
+10.0.0.5 - - [10/Mar/2022:10:01:01 +0000] "POST /scripts/setup.php HTTP/1.1" 404 200
+203.0.113.45 - - [10/Mar/2022:10:02:10 +0000] "GET /?id=' or 1=1--" 403 150
+203.0.113.45 - - [10/Mar/2022:10:02:11 +0000] "GET /images/logo.png HTTP/1.1" 200 5000
+10.0.0.5 - - [10/Mar/2022:10:02:15 +0000] "GET /wp-admin/ HTTP/1.1" 404 200
+"""
+
+with open('access.log', 'w') as f:
+    f.write(log_data)
+
+# Define column names and a regex to parse the log file
+log_regex = r'([(\d\.)]+) - - \[(.*?)\] "(.*?)" (\d{3}) (\d+)'
+column_names = ['ip_address', 'timestamp', 'request', 'status_code', 'response_size']
+
+# Read and parse the log file
+df = pd.read_csv('access.log', sep=log_regex, engine='python', header=None, names=['extra'] + column_names + ['extra2'])
+df = df.drop(columns=['extra', 'extra2'])
+print(df.head())
+
+print("---")
+# Transforming the data
+
+df['timestamp'] = pd.to_datetime(df['timestamp'], format='%d/%b/%Y:%H:%M:%S %z')
+
+# Convert status_code and response_size to numeric types
+df['status_code'] = pd.to_numeric(df['status_code'])
+df['response_size'] = pd.to_numeric(df['response_size'])
+
+# Extract request method, URL, and protocol
+request_parts = df['request'].str.split(' ', n=2, expand=True)
+df['method'] = request_parts[0]
+df['url'] = request_parts[1]
+df['protocol'] = request_parts[2]
+
+# Drop the original request column
+df = df.drop(columns=['request'])
+
+print("\nCleaned DataFrame Info:")
+df.info()
+print(df.head())
+
+print(df.head())
