@@ -3,22 +3,6 @@ import re
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Let's create a dummy log file for this example
-log_data = """
-192.168.1.1 - - [10/Mar/2022:10:00:00 +0000] "GET /index.html HTTP/1.1" 200 1500
-192.168.1.2 - - [10/Mar/2022:10:00:01 +0000] "GET /about.html HTTP/1.1" 200 800
-10.0.0.5 - - [10/Mar/2022:10:00:02 +0000] "GET /admin/login.php HTTP/1.1" 200 500
-192.168.1.1 - - [10/Mar/2022:10:00:03 +0000] "GET /contact.html HTTP/1.1" 200 900
-10.0.0.5 - - [10/Mar/2022:10:01:00 +0000] "GET /etc/passwd HTTP/1.1" 404 200
-10.0.0.5 - - [10/Mar/2022:10:01:01 +0000] "POST /scripts/setup.php HTTP/1.1" 404 200
-203.0.113.45 - - [10/Mar/2022:10:02:10 +0000] "GET /?id=' or 1=1--" 403 150
-203.0.113.45 - - [10/Mar/2022:10:02:11 +0000] "GET /images/logo.png HTTP/1.1" 200 5000
-10.0.0.5 - - [10/Mar/2022:10:02:15 +0000] "GET /wp-admin/ HTTP/1.1" 404 200
-"""
-
-with open('access.log', 'w') as f:
-    f.write(log_data)
-
 # Define column names and a regex to parse the log file
 log_regex = r'([(\d\.)]+) - - \[(.*?)\] "(.*?)" (\d{3}) (\d+)'
 column_names = ['ip_address', 'timestamp', 'request', 'status_code', 'response_size']
@@ -66,5 +50,6 @@ suspicious_ips = error_df['ip_address'].value_counts()
 
 print("\nIPs with the most client-side errors (4xx):")
 print(suspicious_ips)
+
 
 
