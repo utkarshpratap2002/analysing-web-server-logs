@@ -26,9 +26,8 @@ column_names = ['ip_address', 'timestamp', 'request', 'status_code', 'response_s
 # Read and parse the log file
 df = pd.read_csv('access.log', sep=log_regex, engine='python', header=None, names=['extra'] + column_names + ['extra2'])
 df = df.drop(columns=['extra', 'extra2'])
-print(df.head())
+# print(df.head())
 
-print("---")
 # Transforming the data
 
 df['timestamp'] = pd.to_datetime(df['timestamp'], format='%d/%b/%Y:%H:%M:%S %z')
@@ -48,6 +47,24 @@ df = df.drop(columns=['request'])
 
 print("\nCleaned DataFrame Info:")
 df.info()
-print(df.head())
+# print(df.head())
 
-print(df.head())
+# Status code distribution
+status_counts = df['status_code'].value_counts()
+print("\nStatus Code Distribution:")
+print(status_counts)
+
+# Visualize it
+plt.figure(figsize=(8, 8))
+plt.pie(status_counts, labels=status_counts.index, autopct='%1.1f%%', startangle=140)
+plt.title('HTTP Status Code Distribution')
+# plt.show()
+
+# Find IPs that generate a lot of client errors (4xx status codes)
+error_df = df[df['status_code'] >= 400]
+suspicious_ips = error_df['ip_address'].value_counts()
+
+print("\nIPs with the most client-side errors (4xx):")
+print(suspicious_ips)
+
+
