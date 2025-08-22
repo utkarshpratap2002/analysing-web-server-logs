@@ -3,53 +3,28 @@ import re
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Define column names and a regex to parse the log file
-log_regex = r'([(\d\.)]+) - - \[(.*?)\] "(.*?)" (\d{3}) (\d+)'
-column_names = ['ip_address', 'timestamp', 'request', 'status_code', 'response_size']
+# Defining the column names/ regex
+col_names = ['saddr', 'daddr', 'proto', 'sport', 'dport', 'state', 'stos', 'dtos', 'swin', 'dwin', 'shops', 'dhops', 'stime', 'ltime', 'sttl', 'dttl', 'tcprtt', 'synack', 'ackdat', 'spkts', 'dpkts', 'sbytes', 'dbytes', 'sappbytes', 'dappbytes', 'dur', 'pkts', 'bytes', 'appbytes', 'rate', 'srate', 'drate', 'label']
 
-# Read and parse the log file
-df = pd.read_csv('access.log', sep=log_regex, engine='python', header=None, names=['extra'] + column_names + ['extra2'])
-df = df.drop(columns=['extra', 'extra2'])
-# print(df.head())
+# Read and Parse the 
+df = pd.read_csv('capture20110810.binetflow.2format.txt', header=1, engine='python', names=col_names)
 
-# Transforming the data
+# Load the data AGAIN to have a fresh copy with the original strings
+df_original = pd.read_csv('capture20110810.binetflow.2format.txt', header=1, engine='python', names=col_names)
 
-df['timestamp'] = pd.to_datetime(df['timestamp'], format='%d/%b/%Y:%H:%M:%S %z')
+# In your main dataframe, perform the coercion
+df['sport'] = pd.to_numeric(df['sport'],errors="coerce")
 
-# Convert status_code and response_size to numeric types
-df['status_code'] = pd.to_numeric(df['status_code'])
-df['response_size'] = pd.to_numeric(df['response_size'])
+# Now, find the index of the problematic rows from your main df
+problematic_indices = df[df['sport'].isnull()].index
 
-# Extract request method, URL, and protocol
-request_parts = df['request'].str.split(' ', n=2, expand=True)
-df['method'] = request_parts[0]
-df['url'] = request_parts[1]
-df['protocol'] = request_parts[2]
-
-# Drop the original request column
-df = df.drop(columns=['request'])
-
-print("\nCleaned DataFrame Info:")
-df.info()
-# print(df.head())
-
-# Status code distribution
-status_counts = df['status_code'].value_counts()
-print("\nStatus Code Distribution:")
-print(status_counts)
-
-# Visualize it
-plt.figure(figsize=(8, 8))
-plt.pie(status_counts, labels=status_counts.index, autopct='%1.1f%%', startangle=140)
-plt.title('HTTP Status Code Distribution')
-# plt.show()
-
-# Find IPs that generate a lot of client errors (4xx status codes)
-error_df = df[df['status_code'] >= 400]
-suspicious_ips = error_df['ip_address'].value_counts()
-
-print("\nIPs with the most client-side errors (4xx):")
-print(suspicious_ips)
+# Using problematic_indices to see what values are coming on these indices
+original_problem_values = df_original.loc[problematic_indices]
 
 
+# Printing the sample values
+print("Printing the Sample Values for Problematic Values from the Original Data: ")
+print(original_problem_values[["proto", "sport", "dport", "label"]].head(20))
 
+print("\nWhat are the unique non-numeric 'sport' values?")
+print(original_problem_values["sport"].value_counts())
