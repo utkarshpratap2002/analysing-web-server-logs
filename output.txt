@@ -1,0 +1,45 @@
+❯ python parser.py
+Printing the Sample Values for Problematic Values from the Original Data: 
+    proto   sport   dport                               label
+219   pim     NaN     NaN                     flow=Background
+333  icmp  0x0303  0xae0b       flow=To-Background-CVUT-Proxy
+392  icmp  0x0003  0xc000                     flow=Background
+402   arp     NaN     NaN                     flow=Background
+588  icmp  0x0008  0xf8fb                     flow=Background
+589  icmp  0x000b  0x0000                     flow=Background
+613  icmp  0x0008  0xf8fb                     flow=Background
+645  icmp  0x0103  0x02dc                     flow=Background
+678  icmp  0x0103  0x0a00                     flow=Background
+688  icmp  0x0303  0xe11a  flow=Background-Attempt-cmpgw-CVUT
+690  icmp  0x0303  0xcce5                     flow=Background
+694  icmp  0x0303  0x5000                     flow=Background
+783  icmp  0x0303  0xe11a  flow=Background-Attempt-cmpgw-CVUT
+806  icmp  0x0103  0x5a03                     flow=Background
+811  icmp  0x0303  0xe11a  flow=Background-Attempt-cmpgw-CVUT
+859  icmp  0x0103  0x9320  flow=Background-Attempt-cmpgw-CVUT
+944  icmp  0x0103  0x1f09                     flow=Background
+967  icmp  0x0000  0xcb07                     flow=Background
+968  icmp  0x0105  0x9320                     flow=Background
+995  icmp  0x0103  0xd4b2                     flow=Background
+
+What are the unique non-numeric 'sport' values?
+sport
+0x0303    23596
+0x0000     7031
+0x0103     3588
+0x0008     2977
+0x0105      862
+0x000b      470
+0x0d03      431
+0x0a03      380
+0x0003      321
+0x0004       13
+0x0403       10
+0x0203        5
+0x001f        4
+0x0903        2
+0x1126        1
+0x1107        1
+0x201f        1
+0x012e        1
+Name: count, dtype: int64
